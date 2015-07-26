@@ -7,6 +7,10 @@ var mainCanvas;
 var blackCurtain;
 var INT_MAX = 2147483647;
 var player;
+var map_array = [];
+var blocks = [];
+
+
 
 var width = Player.width;
 var height = Player.height;
@@ -14,7 +18,32 @@ var XSIZE = 22;
 var YSIZE = 15;
 var GRAVITY = 1;
 var JUMP_SPEED = -10;
-var player_bytes = "00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff 2e 29 29 ff 00 00 00 ff 0b 04 07 ff 0c 05 04 ff 0e 04 03 ff 11 03 05 ff 14 03 07 ff 01 00 01 ff 1b 18 1a ff f8 fa fb 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff fc ff ff ff 38 2b 28 ff 2d 07 00 ff 44 21 17 ff 47 21 0e ff 46 20 0a ff 48 1f 10 ff 53 2a 21 ff 45 23 20 ff 09 04 04 ff 33 36 36 ff f3 f4 f4 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff f9 fc fd ff 3e 3f 40 ff 35 16 04 ff 5d 26 07 ff 64 2d 12 ff 64 25 0b ff 68 2b 0d ff 61 26 07 ff 5f 25 09 ff 63 2b 1b ff 48 24 1d ff 00 00 00 ff 2e 30 2f ff fd ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff f7 fa fb ff 00 00 00 ff 37 15 05 ff e5 b5 8b ff f0 c4 99 ff e9 b4 8e ff ef c4 a1 ff d9 ac 87 ff 5d 24 07 ff 58 1a 05 ff 65 2c 1b ff 2f 0c 02 ff 0c 08 09 ff f9 fc fe 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff fd fe fe ff 0c 0b 0e ff 1c 0d 06 ff e5 c9 a6 ff 7e 66 53 ff d2 b2 94 ff 6d 5e 57 ff f8 ce b0 ff e5 b5 88 ff 59 2d 0c ff 5d 1c 08 ff 5b 25 16 ff 00 02 03 ff 3e 42 46 ff fe fd fd 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff cf cf d2 ff 40 3d 36 ff b8 99 7a ff 41 2b 20 ff b3 99 6d ff 2e 1f 18 ff f3 be 96 ff ff e2 a6 ff 56 2a 10 ff 55 12 00 ff 64 2d 12 ff 2e 09 00 ff 0d 05 06 ff f8 f8 fa 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff 46 41 3d ff d1 a1 7a ff f6 cf b1 ff ff dc 9c ff f4 c3 95 ff ff e0 b5 ff ff e8 b9 ff d3 9a 80 ff 62 25 10 ff 59 28 10 ff 43 10 02 ff 1e 18 16 ff f9 fb fb 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff ef f2 f6 ff 42 43 39 ff d3 ac 82 ff 7e 69 64 ff 52 43 3b ff 6e 52 48 ff 47 3c 3c ff 5c 4e 3b ff f9 d2 9d ff 6f 3f 31 ff 18 07 06 ff 1c 17 0e ff bd cb c6 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff 56 53 48 ff e6 be 8e ff 00 00 00 ff 00 00 00 ff 00 00 00 ff 00 00 00 ff a9 89 67 ff ff e2 b1 ff 26 20 1b ff 00 00 00 ff 7a 2d 35 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff 61 61 61 ff 60 60 5f ff 63 63 63 ff 65 66 67 ff 5a 5d 61 ff 18 16 15 ff 62 4d 3b ff ce b6 95 ff cc b9 8c ff be ae 7e ff d5 bc 8b ff ff fb c3 ff 7d 5d 52 ff 00 00 00 ff 00 00 00 ff 55 0e 0a ff cc 77 6f 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff 00 00 00 ff 00 00 00 ff 00 00 00 ff 00 00 00 ff 00 00 00 ff 00 00 00 ff 00 00 00 ff 7d 6e 55 ff 8e 78 5a ff 6d 59 42 ff 72 5c 43 ff 5b 4e 26 ff 00 00 00 ff 08 18 5b ff 09 18 55 ff 00 00 08 ff 30 00 00 ff bf 7b 75 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff a9 a8 a8 ff ab ab ac ff a6 a6 a6 ff 17 14 13 ff 00 00 00 ff 00 00 00 ff 00 00 00 ff 00 00 00 ff 00 00 2b ff 9f 82 62 ff 9a 82 6a ff 00 00 1c ff 00 00 06 ff 17 10 67 ff 26 1e af ff 09 13 65 ff 01 00 00 ff 8d 00 00 ff c5 7f 7f 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff 3b 37 36 ff a6 93 7e ff 9d 84 6e ff 00 00 00 ff 00 00 10 ff 1d 27 93 ff 9f 8e bd ff 94 8e b5 ff 20 1e b4 ff 09 10 50 ff 09 00 00 ff 09 0f 33 ff 00 08 7b ff 00 00 6c ff 48 00 09 ff 98 00 00 ff c1 8b 86 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff f2 f3 f4 ff 02 00 05 ff 95 7c 65 ff ff ff db ff c3 a7 7b ff 14 0e 21 ff 0b 0c 8e ff 00 00 98 ff 00 00 85 ff 0e 1e ad ff 1a 28 b2 ff 00 0e 3d ff 16 12 12 ff b3 a0 bc ff 88 78 ab ff 00 00 00 ff 9d 00 00 ff 9b 00 00 ff bb 90 8d 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff 8b 8d 91 ff 00 00 00 ff 5a 44 1f ff 86 72 55 ff 1c 13 1e ff 01 00 35 ff 06 08 42 ff 09 04 44 ff 02 05 41 ff 04 07 52 ff 02 09 50 ff 11 0d 1c ff cd a1 6c ff ff ff be ff 99 84 69 ff 58 0a 0b ff 9f 00 00 ff 93 00 00 ff c4 8b 90 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff 90 90 96 ff 5e 62 6b ff 56 57 5a ff 10 17 0f ff 0b 21 1e ff 10 1f 23 ff 11 18 26 ff 12 1f 2a ff 18 20 19 ff 13 07 00 ff 07 03 00 ff 00 00 00 ff a1 8d 7a ff ff ff d4 ff 33 26 1e ff 79 00 00 ff b7 00 00 ff 76 00 00 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff 00 00 00 ff 06 14 2f ff 24 5c 8b ff 27 5a 90 ff 24 5a 80 ff 13 35 47 ff 11 03 04 ff 3a 08 0d ff 11 00 02 ff 00 00 00 ff 80 72 63 ff 30 19 18 ff 87 03 04 ff 91 00 00 ff 67 00 00 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff 9e 9b 9b ff 0b 07 06 ff 00 00 0d ff 00 03 24 ff 00 00 13 ff 00 00 00 ff 25 03 0b ff 4c 05 15 ff 55 07 0c ff 1c 00 00 ff 00 00 00 ff 13 00 00 ff 60 00 00 ff aa 67 69 ff ae 79 7a 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff be be bf ff aa ac ac ff c8 c8 c8 ff 28 26 25 ff 81 7f 76 ff 74 72 6c ff 73 73 6f ff 9b 90 8c ff 39 16 10 ff 25 06 03 ff 21 03 04 ff 37 1d 1b ff b4 97 94 ff b5 77 77 ff b4 84 83 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff fe fe fe ff ad ad ad ff 00 00 00 ff 00 00 00 ff 00 00 00 ff 0f 0e 0d ff cf ce ce 00 ff ff ff 00 ff ff ff ff ce d0 d0 ff 0e 0e 0e ff 00 00 00 ff 00 00 00 ff 19 1a 1b ff d1 d4 d3 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff f8 f9 f9 ff 00 00 00 ff 00 00 00 ff 06 00 00 ff 04 00 00 ff 00 00 00 ff 07 04 05 00 ff ff ff 00 ff ff ff ff 05 06 06 ff 00 00 00 ff 0b 00 01 ff 08 00 00 ff 00 00 00 ff 01 00 00 ff fb fb fb 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff 00 ff ff ff ff f9 fa fa ff 1b 19 19 ff 00 00 00 ff 09 01 01 ff 08 00 00 ff 00 00 00 ff 21 1e 1f 00 ff ff ff 00 ff ff ff ff 20 20 20 ff 00 00 00 ff 0a 00 00 ff 07 00 00 ff 00 00 00 ff 1c 1a 1a ff fb fc fc 00 ff ff ff 00 ff ff ff 00 ff ff ff ff ff 00 00";
+
+var tl = {};
+tl.x = width / 2 - XSIZE * 16;
+tl.y = height / 2 - YSIZE * 16;
+var br = {};
+br.x = width / 2 + XSIZE * 16;
+br.y = height / 2 + YSIZE * 16;
+
+var player_bytes = "";
+function fillRect(g, x, y, width, height, color) {
+    g.graphics.beginFill(color);
+    g.graphics.drawRect(x, y, width, height);
+    g.graphics.endFill();
+}
+
+function createBitmap(bitmapData, x, y, lifeTime, parent) {
+    var bmp = Bitmap.createBitmap({
+        bitmapData: bitmapData,
+        lifeTime: lifeTime,
+        parent: parent
+    });
+    bmp.x = x;
+    bmp.y = y;
+    return bmp;
+}
+
 function Bytes2Bytestr(param1)
 {
  var ret = "";
@@ -157,7 +186,7 @@ function createMainCanvas() {
     });
     var e = StrToByteArr(player_bytes);
     var c = compress(e);
-    trace(c);
+    // trace(c);
     
 }
 
@@ -170,14 +199,12 @@ function createPlayer() {
         parent: mainCanvas
     });
     player.shape = pic;
-    player.shape.x = width - 22;
-    player.shape.y = height - 22;
+    player.shape.x = tl.x + 32;
+    player.shape.y = tl.y + 10;
 
     player.collisionBox = $.createShape({
-        x: width - 22,
-        y: height - 22,
         alpha: 0,
-        lifeTime: 0,
+        lifeTime: INT_MAX,
         parent: mainCanvas
     });
     fillRect(player.collisionBox, 5, 0, 16, 22, 0x000000);
@@ -188,16 +215,58 @@ function createPlayer() {
     player.isFlying = false;
 }
 
-function fillRect(g, x, y, width, height, color) {
-    g.graphics.beginFill(color);
-    g.graphics.drawRect(x, y, width, height);
-    g.graphics.endFill();
+function createMap() {
+
+
+    
+    var bmd_block = loadBitmapData(32, 32, raw_block);
+    // var 
+
+    for (var i = 0; i < XSIZE; i++) {
+        var blocks_row = [];
+        for (var j = 0; j < YSIZE; j++) {
+            if (i == j) {
+                var block = {};
+                var bmp_block = createBitmap(bmd_block, tl.x + i * 32, tl.y + j * 32, 0, mainCanvas);
+                block.shape = bmp_block;
+                block.collisionBox = $.createShape({
+                    x: bmp_block.x,
+                    y: bmp_block.y,
+                    alpha: 0,
+                    lifeTime: INT_MAX,
+                    parent:mainCanvas
+                });
+                fillRect(block.collisionBox, 0, 0, 32, 32, 0x000000);
+                blocks_row.push(block);
+            } else {
+                var block = 0;
+                blocks_row.push(block);
+            }          
+        };
+        blocks.push(blocks_row);
+    };
+    var block = {};
+    var bmp_block = createBitmap(bmd_block, tl.x + 4 * 32, tl.y + 2 * 32, 0, mainCanvas);
+    block.shape = bmp_block;
+    block.collisionBox = $.createShape({
+        x: bmp_block.x,
+        y: bmp_block.y,
+        alpha: 0,
+        lifeTime: INT_MAX,
+        parent:mainCanvas
+    });
+    fillRect(block.collisionBox, 0, 0, 32, 32, 0x000000);
+    blocks[4][2] = block;
+
 }
+
+
 
 function keyDown(key) {
 	if (key == 87) {
-		if (!player.isFlying) {
-            player.isFlying = true;
+        trace(player.ySpeed);
+		if (!player.ySpeed) {
+            // trace("here");
 			player.ySpeed = JUMP_SPEED;
 		};		
 	};
@@ -217,46 +286,123 @@ function keyUp(key) {
 }
 
 function gameRunning() {
+    // checkCollision();
+
     checkCollision();
-    // if (!player.willCollide) {
-        movePlayer();
-    // };
+    movePlayer();
+    checkGround();
+    
     
 }
 
 function movePlayer() {
-	player.shape.x += player.xSpeed;
-	if (player.isFlying) {
-		player.ySpeed += GRAVITY;   	
-    	player.shape.y += player.ySpeed;
-	} 
+	player.shape.x += player.xSpeed;  	
+    player.shape.y += player.ySpeed;
     
     player.collisionBox.x = player.shape.x;
     player.collisionBox.y = player.shape.y;
 }
 
+function checkHit(playerX, playerY, collider) {
+    if (playerY + 22 > collider.y) {
+        return true;
+    };
+    return false;
+}
+
+function checkGround() {
+    var hit = false;
+    var x = player.collisionBox.x;
+    var y = player.collisionBox.y;
+    var start_i = (Math.floor((x - tl.x) / 32) >= 0) ? (Math.floor((x - tl.x) / 32)) : 0;
+    var end_i = (Math.floor((x + 22 - tl.x) / 32) >= 0) ? (Math.floor((x + 22 - tl.x) / 32)) : 0;
+
+    var j = Math.floor((y + 22 - tl.y) / 32) >= 0 ? Math.floor((y + 22 - tl.y) / 32) : 0;
+    var i = 0;
+    for (i = start_i; i <= end_i; i++) {
+        // trace(end_i);
+        // trace(j);
+        if (blocks[i][j] != 0 ) {
+
+            if (player.collisionBox.hitTestObject(blocks[i][j].collisionBox)) {
+            //     trace(i);
+            // trace(j);
+                hit = true;
+            }
+        };
+    };
+    if (!hit) {
+        player.ySpeed += GRAVITY;
+        for (i = start_i; i <= end_i; i++) {
+            if (blocks[i][j+1] != 0 ) {
+                if (checkHit(x, y + player.ySpeed, blocks[i][j+1].collisionBox)) {
+                    player.ySpeed = blocks[i][j+1].collisionBox.y - y - 22;
+                    break;
+                }
+            };
+        };
+    } else {
+        player.ySpeed = 0;
+    }
+    // trace ("here");
+}
 
 function checkCollision() {
-    var nextX = player.shape.x + player.xSpeed;
-    var nextY = -1;
-    if (player.isFlying) {   
-        nextY = player.shape.y + player.ySpeed + GRAVITY;
-    } 
-	if (nextY > height - 22) {
-        player.ySpeed = 0;
-        player.isFlying = false;
-	}
-    if (nextX > width - 22 || nextX < 0) {
-        player.xSpeed = 0;
+    if (player.xSpeed < 0) {
+        var x = player.collisionBox.x + 2 + player.xSpeed;
+        var y = player.collisionBox.y + player.ySpeed;
+        var i = Math.floor((x - tl.x) / 32);
+        if (i < 0) { i = 0; };
+        var start_j = Math.floor((y - tl.y) / 32);
+        if (start_j < 0) { start_j = 0; };
+        var end_j = Math.floor((y + 21 - tl.y) / 32);
+        if (end_j < 0) { end_j = 0; };
+        for (var j = start_j; j <= end_j; j++) {
+            if (blocks[i][j] != 0) {
+                // trace("hit");
+                player.xSpeed = 0;
+            }
+        };
     };
+    if (player.xSpeed > 0) {
+        var x = player.collisionBox.x + 22 + player.xSpeed;
+        var y = player.collisionBox.y + player.ySpeed;
+        var i = Math.floor((x - tl.x) / 32);
+        if (i < 0) { i = 0; };
+        var start_j = Math.floor((y - tl.y) / 32);
+        if (start_j < 0) { start_j = 0; };
+        var end_j = Math.floor((y + 21 - tl.y) / 32);
+        if (end_j < 0) { end_j = 0; };
+        for (var j = start_j; j <= end_j; j++) {
+            if (blocks[i][j] != 0) {
+                // trace("hit");
+                player.xSpeed = 0;
+            }
+        };
+    };   
 }
 
 function main() {
     init();
     createBackground();
     createMainCanvas();
+    createMap();
+    // var bmd_block = loadBitmapData(32, 32, raw_block);
+    // var bmp_block = createBitmap(bmd_block, 32, 32, 0, mainCanvas);
+    
+    // block.shape = bmp_block;
+    // block.collisionBox = $.createShape({
+    //     x: bmp_block.x,
+    //     y: bmp_block.y,
+    //     alpha: 0.5,
+    //     lifeTime: 0,
+    //     parent:mainCanvas
+    // });
+    // fillRect(block.collisionBox, 0, 0, 32, 32, 0x000000);
+
     createPlayer();
 
+    $.frameRate = 40;
     $.root.addEventListener("enterFrame", gameRunning);
 	Player.keyTrigger(function(key){
  		keyDown(key);
