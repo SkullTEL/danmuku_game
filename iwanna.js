@@ -18,8 +18,12 @@ var width = Player.width;
 var height = Player.height;
 var XSIZE = 22;
 var YSIZE = 15;
-var GRAVITY = 1;
+
+var GRAVITY_ORIGIN = 1.96;
+var GRAVITY_FLOAT = 0.62;
+var GRAVITY = GRAVITY_ORIGIN;
 var JUMP_SPEED = -10;
+var MAX_JUMP_POWER = 2;
 
 var tl = {};
 tl.x = width / 2 - XSIZE * 16;
@@ -214,7 +218,8 @@ function createPlayer() {
     player.collisionBox.y = player.shape.y;
     player.ySpeed = 0;
     player.xSpeed = 0;
-    player.isFlying = false;
+    player.currentPower = 0;
+    player.lock = false;
 }
 
 function createMap() {
@@ -279,9 +284,13 @@ function keyDown(key) {
 	if (key == 87) {
         trace(player.ySpeed);
 		if (!player.ySpeed) {
-            // trace("here");
 			player.ySpeed = JUMP_SPEED;
-		};		
+            GRAVITY = GRAVITY_FLOAT;
+		} else if (player.currentPower == 1) {
+            player.currentPower++;
+            player.ySpeed = JUMP_SPEED;
+            GRAVITY = GRAVITY_FLOAT;
+        };
 	};
 	if (key == 65) {
 		player.xSpeed = -3;
@@ -296,6 +305,12 @@ function keyUp(key) {
 	if (key == 65 || key == 68) {
 		player.xSpeed = 0;
 	};
+    if (key == 87) {
+        GRAVITY = GRAVITY_ORIGIN;
+        if (player.ySpeed) {
+            player.currentPower++;
+        };
+    };
 }
 
 function gameRunning() {
@@ -309,6 +324,9 @@ function gameRunning() {
 }
 
 function movePlayer() {
+    if (player.ySpeed > -2) {
+        GRAVITY = GRAVITY_ORIGIN;
+    };
 	player.shape.x += player.xSpeed;  	
     player.shape.y += player.ySpeed;
     
@@ -347,6 +365,7 @@ function checkGround() {
         };
     } else {
         player.ySpeed = 0;
+        player.currentPower = 0;
     }
 }
 
@@ -435,7 +454,7 @@ function checkStab() {
         trace("hit");
         // $.root.removeEventListener("enterFrame", gameRunning);
     } else {
-        trace("miss");
+        // trace("miss");
     }
 }
 
@@ -459,5 +478,19 @@ function main() {
 	Player.keyTrigger(function(key){
  		keyUp(key);
 	},INT_MAX,true);
+
+    var bmp_stab = createBitmap(bmd_stab, tl.x + 22 * 32, tl.y + 13 * 32, 0, mainCanvas);
+    $.root.mouseEnabled = true;
+    $.root.addEventListener("mouseMove", function (e) {
+        // trace(e.localX);
+        if (bmp_stab.hitTestPoint(e.localX, e.localY, true)) {
+            bmp_stab.alpha = 0.5;
+            // bmp_stab.x = e.localX;
+            // bmp_stab.y = e.localY;
+            // trace("true");
+        } else {
+            bmp_stab.alpha = 1;
+        }
+    });
 }
 main();
