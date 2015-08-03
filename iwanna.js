@@ -12,7 +12,8 @@ var bmd_stab = {};
 var map_array = [];
 var blocks = [];
 var stab = {};
-
+var drag_models = [];
+var g = {};
 
 var width = Player.width;
 var height = Player.height;
@@ -25,6 +26,10 @@ var GRAVITY = GRAVITY_ORIGIN;
 var JUMP_SPEED = -10;
 var MAX_JUMP_POWER = 2;
 
+var TYPE_EMPTY = 0;
+var TYPE_BLOCK = 1;
+var TYPE_STAB = 2;
+
 var tl = {};
 tl.x = width / 2 - XSIZE * 16;
 tl.y = height / 2 - YSIZE * 16;
@@ -33,10 +38,26 @@ br.x = width / 2 + XSIZE * 16;
 br.y = height / 2 + YSIZE * 16;
 
 var player_bytes = "";
+
 function fillRect(g, x, y, width, height, color) {
     g.graphics.beginFill(color);
     g.graphics.drawRect(x, y, width, height);
     g.graphics.endFill();
+}
+
+
+function drawBound(x, y) {
+
+    g.x = tl.x + 32 * x;
+    g.y = tl.y + 32 * y;
+}
+
+function trimX(x) {
+    return (Math.floor((x - tl.x) / 32));
+}
+
+function trimY(y) {
+    return (Math.floor((y - tl.y) / 32));
 }
 
 function createBitmap(bitmapData, x, y, lifeTime, parent) {
@@ -169,6 +190,18 @@ function init() {
     ScriptManager.clearTimer();
     ScriptManager.clearEl();
     ScriptManager.clearTrigger();
+    for (var i = 0; i < XSIZE; i++) {
+        var blocks_row = [];
+        for (var j = 0; j < YSIZE; j++) {
+            var block = {};
+            // trace("here");
+            blocks_row.push(block);
+        }
+        blocks.push(blocks_row);
+    }
+    bmd_stab = loadBitmapData(32, 32, raw_stab);
+    bmd_player = loadBitmapData(22,22,raw_player);
+    bmd_block = loadBitmapData(32, 32, raw_block);
 }
 
 function createBackground() {
@@ -190,15 +223,26 @@ function createMainCanvas() {
         y: 0,
         lifeTime: INT_MAX
     });
-    var e = StrToByteArr(player_bytes);
-    var c = compress(e);
+    // var e = StrToByteArr(player_bytes);
+    // var c = compress(e);
     // trace(c);
-    
+    var myshape = $.createShape({
+        alpha: 1,
+        lifeTime: INT_MAX,
+        parent: mainCanvas
+    });
+    g = $.createShape({lifeTime:2,x:-100,y:-100});
+    g.graphics.moveTo(0, 0);
+    g.graphics.lineStyle(2, 0xFFD700, 1, false);
+    g.graphics.lineTo(32, 0);
+    g.graphics.lineTo(32, 32);
+    g.graphics.lineTo(0, 32);
+    g.graphics.lineTo(0, 0);
 }
 
 function createPlayer() {
 	player = {};
-	bmd_player = loadBitmapData(22,22,raw_player);
+	
     var pic = Bitmap.createBitmap({
         bitmapData: bmd_player,
         lifeTime: INT_MAX,
@@ -206,7 +250,7 @@ function createPlayer() {
     });
     player.shape = pic;
     player.shape.x = tl.x + 64;
-    player.shape.y = tl.y + 42;
+    player.shape.y = tl.y + 32;
 
     player.collisionBox = $.createShape({
         alpha: 0,
@@ -222,67 +266,52 @@ function createPlayer() {
     player.lock = false;
 }
 
-function createMap() {
-
-
-    
-    var bmd_block = loadBitmapData(32, 32, raw_block);
-    // var 
-
-    for (var i = 0; i < XSIZE; i++) {
-        var blocks_row = [];
-        for (var j = 0; j < YSIZE; j++) {
-            if (i == j || i == 0 || (i == XSIZE - 1) || (j == 0) || (j == YSIZE - 1)) {
-                var block = {};
-                var bmp_block = createBitmap(bmd_block, tl.x + i * 32, tl.y + j * 32, 0, mainCanvas);
-                block.shape = bmp_block;
-                block.collisionBox = $.createShape({
-                    x: bmp_block.x,
-                    y: bmp_block.y,
-                    alpha: 0,
-                    lifeTime: INT_MAX,
-                    parent:mainCanvas
-                });
-                fillRect(block.collisionBox, 0, 0, 32, 32, 0x000000);
-                blocks_row.push(block);
-            } else {
-                var block = 0;
-                blocks_row.push(block);
-            }          
-        };
-        blocks.push(blocks_row);
-    };
+function placeObj(map, x, y, type) {
     var block = {};
-    var bmp_block = createBitmap(bmd_block, tl.x + 1 * 32, tl.y + 2 * 32, 0, mainCanvas);
-    block.shape = bmp_block;
-    block.collisionBox = $.createShape({
-        x: bmp_block.x,
-        y: bmp_block.y,
-        alpha: 0,
-        lifeTime: INT_MAX,
-        parent:mainCanvas
-    });
-    fillRect(block.collisionBox, 0, 0, 32, 32, 0x000000);
-    blocks[1][2] = block;
+    block.type = type;
+    if (type == TYPE_BLOCK) {
+        var bmp_block = createBitmap(bmd_block, tl.x + x * 32, tl.y + y * 32, 0, mainCanvas);
+        block.shape = bmp_block;
+        map[x][y] = block;
+    } else if (type == TYPE_EMPTY) {
+        map[x][y] = block;
+    } else if (type == TYPE_STAB) {
+        var bmp_stab = createBitmap(bmd_stab, tl.x + x * 32, tl.y + y * 32, 0, mainCanvas);
+        block.shape = bmp_stab;
+        map[x][y] = block;
+    };
 
-    bmd_stab = loadBitmapData(32, 32, raw_stab);
-    var bmp_stab = createBitmap(bmd_stab, tl.x + 20 * 32, tl.y + 13 * 32, 0, mainCanvas);
-    stab.shape = bmp_stab;
-    // stab.collisionBox = $.createShape({
-    //     x: bmp_stab.x,
-    //     y: bmp_stab.y,
-    //     alpha: 0,
-    //     lifeTime: INT_MAX,
-    //     parent:mainCanvas
-    // });
-    // fillRect(stab.collisionBox, 0, 0, 32, 32, 0x000000);
 }
 
+function createMap() {
+    for (var i = 0; i < XSIZE; i++) {
+        for (var j = 0; j < YSIZE; j++) {
+            if (i == j || i == 0 || (i == XSIZE - 1) || (j == 0) || (j == YSIZE - 1)) {
+                placeObj(blocks, i, j, TYPE_BLOCK);
+            } else {
+                placeObj(blocks, i, j, TYPE_EMPTY);
+            }          
+        };
+    };
+    
+    placeObj(blocks, 20, 13, TYPE_STAB);
+}
 
+function createDragModels() {
+
+    var static_stab = createBitmap(bmd_stab, tl.x + 22 * 32, tl.y + 13 * 32, 0, mainCanvas);
+    var dynamic_stab = createBitmap(bmd_stab, tl.x + 22 * 32, tl.y + 13 * 32, 0, mainCanvas);
+    var model = {};
+    model.still = static_stab;
+    model.move = dynamic_stab;
+    (model.move).alpha = 0;
+    model.dragging = false;
+    drag_models.push(model);
+
+}
 
 function keyDown(key) {
 	if (key == 87) {
-        trace(player.ySpeed);
 		if (!player.ySpeed) {
 			player.ySpeed = JUMP_SPEED;
             GRAVITY = GRAVITY_FLOAT;
@@ -346,9 +375,8 @@ function checkGround() {
     for (i = start_i; i <= end_i; i++) {
         // trace(end_i);
         // trace(j);
-        if (blocks[i][j] != 0 ) {
-
-            if (player.collisionBox.hitTestObject(blocks[i][j].collisionBox)) {
+        if (blocks[i][j].type == TYPE_BLOCK) {
+            if (player.collisionBox.hitTestObject(blocks[i][j].shape)) {
                 hit = true;
             }
         };
@@ -356,9 +384,9 @@ function checkGround() {
     if (!hit) {
         player.ySpeed += GRAVITY;
         for (i = start_i; i <= end_i; i++) {
-            if (blocks[i][j+1] != 0 ) {
-                if (y + player.ySpeed + 22 > blocks[i][j+1].collisionBox.y) {
-                    player.ySpeed = blocks[i][j+1].collisionBox.y - y - 22;
+            if (blocks[i][j+1].type == TYPE_BLOCK) {
+                if (y + player.ySpeed + 22 > blocks[i][j+1].shape.y) {
+                    player.ySpeed = blocks[i][j+1].shape.y - y - 22;
                     break;
                 }
             };
@@ -381,8 +409,8 @@ function checkCeiling() {
     for (i = start_i; i <= end_i; i++) {
         // trace(end_i);
         // trace(j);
-        if (blocks[i][j] != 0 ) {
-            if (player.collisionBox.hitTestObject(blocks[i][j].collisionBox)) {
+        if (blocks[i][j].type == TYPE_BLOCK) {
+            if (player.collisionBox.hitTestObject(blocks[i][j].shape)) {
                 hit = true;
             }
         };
@@ -391,10 +419,9 @@ function checkCeiling() {
         // player.ySpeed += GRAVITY;
         // trace(j);
         for (i = start_i; i <= end_i; i++) {
-            if (blocks[i][j-1] != 0 ) {
-                if (y + player.ySpeed < blocks[i][j-1].collisionBox.y + 32) {
-                    player.ySpeed = y - 32 - blocks[i][j-1].collisionBox.y;
-                    trace(player.ySpeed);
+            if (blocks[i][j-1].type == TYPE_BLOCK) {
+                if (y + player.ySpeed < blocks[i][j-1].shape.y + 32) {
+                    player.ySpeed = y - 32 - blocks[i][j-1].shape.y;
                     break;
                 }
             };
@@ -415,7 +442,7 @@ function checkCollision() {
         var end_j = Math.floor((y + 21 - tl.y) / 32);
         if (end_j < 0) { end_j = 0; };
         for (var j = start_j; j <= end_j; j++) {
-            if (blocks[i][j] != 0) {
+            if (blocks[i][j].type == TYPE_BLOCK) {
                 // trace("hit");
                 player.xSpeed = 0;
             }
@@ -431,8 +458,7 @@ function checkCollision() {
         var end_j = Math.floor((y + 21 - tl.y) / 32);
         if (end_j < 0) { end_j = 0; };
         for (var j = start_j; j <= end_j; j++) {
-            if (blocks[i][j] != 0) {
-                // trace("hit");
+            if (blocks[i][j].type == TYPE_BLOCK) {
                 player.xSpeed = 0;
             }
         };
@@ -444,12 +470,13 @@ function checkStab() {
     var y = player.collisionBox.y;
     var bmd1 = Bitmap.createBitmapData(1, 1);
     var p1 = (bmd1.rect).topLeft;
-    p1.x = stab.shape.x;
-    p1.y = stab.shape.y;
+    p1.x = blocks[20][13].shape.x;
+    p1.y = blocks[20][13].shape.y;
     var bmd2 = Bitmap.createBitmapData(1, 1);
     var p2 = (bmd2.rect).topLeft;
     p2.x = player.shape.x;
     p2.y = player.shape.y;
+
     if (bmd_stab.hitTest(p1, 255, bmd_player, p2, 255)) {
         trace("hit");
         // $.root.removeEventListener("enterFrame", gameRunning);
@@ -467,7 +494,7 @@ function main() {
     createBackground();
     createMainCanvas();
     createMap();
-
+    createDragModels();
     createPlayer();
 
     $.frameRate = 40;
@@ -479,18 +506,48 @@ function main() {
  		keyUp(key);
 	},INT_MAX,true);
 
-    var bmp_stab = createBitmap(bmd_stab, tl.x + 22 * 32, tl.y + 13 * 32, 0, mainCanvas);
+    // var bmp_stab = createBitmap(bmd_stab, tl.x + 22 * 32, tl.y + 13 * 32, 0, mainCanvas);
+    // var dragging = false;
     $.root.mouseEnabled = true;
     $.root.addEventListener("mouseMove", function (e) {
-        // trace(e.localX);
-        if (bmp_stab.hitTestPoint(e.localX, e.localY, true)) {
-            bmp_stab.alpha = 0.5;
-            // bmp_stab.x = e.localX;
-            // bmp_stab.y = e.localY;
-            // trace("true");
-        } else {
-            bmp_stab.alpha = 1;
+        
+
+        for (var i = 0; i < drag_models.length; i++) {
+            if (drag_models[i].dragging) {
+                drag_models[i].move.alpha = 1;
+                drag_models[i].move.x = e.localX - 16;
+                drag_models[i].move.y = e.localY - 16;
+                if (blocks[trimX(e.localX)][trimY(e.localY)].type == TYPE_EMPTY) {
+                    drawBound(trimX(e.localX), trimY(e.localY)); 
+                } else {
+                    drawBound(-100, -100); 
+                }
+            };
         }
+
+        for (var i = 0; i < drag_models.length; i++) {
+            if ((e.localX > drag_models[i].still.x) && (e.localX < drag_models[i].still.x + 32) 
+            && (e.localY > drag_models[i].still.y) && (e.localY < drag_models[i].still.y + 32)) {
+                drag_models[i].still.alpha = 0.5;
+            } else {
+                drag_models[i].still.alpha = 1;
+            }
+        };
+        
+    });
+    $.root.addEventListener("mouseUp", function (e) {
+        for (var i = 0; i < drag_models.length; i++) {
+            if (!drag_models[i].dragging && (drag_models[i].still.alpha == 0.5)) {
+                drag_models[i].dragging = true;
+            } else if (drag_models[i].dragging) {
+                if (blocks[trimX(e.localX)][trimY(e.localY)].type == TYPE_EMPTY) {
+                    placeObj(blocks, trimX(e.localX), trimY(e.localY), TYPE_STAB);
+                }
+                drag_models[i].dragging = false;
+                drag_models[i].move.alpha = 0;
+                drawBound(-100, -100);
+            };
+        };
     });
 }
 main();
