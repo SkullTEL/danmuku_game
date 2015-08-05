@@ -8,18 +8,25 @@ var blackCurtain;
 var INT_MAX = 2147483647;
 var player;
 var bmd_player = {};
-var bmd_stab = {};
+var bmd_stab_up = {};
+var bmd_stab_down = {};
+var bmd_stab_left = {};
+var bmd_stab_right = {};
+var bmd_block = {};
+var bmd_block_solid = {};
 var map_array = [];
 var blocks = [];
 var stab = {};
 var drag_models = [];
 var g = {};
+var mask = {};
 
 var width = Player.width;
 var height = Player.height;
 var XSIZE = 22;
 var YSIZE = 15;
 
+var MAP_TO_LOAD = "";
 var GRAVITY_ORIGIN = 1.96;
 var GRAVITY_FLOAT = 0.62;
 var GRAVITY = GRAVITY_ORIGIN;
@@ -28,7 +35,12 @@ var MAX_JUMP_POWER = 2;
 
 var TYPE_EMPTY = 0;
 var TYPE_BLOCK = 1;
-var TYPE_STAB = 2;
+var TYPE_BLOCK_SOLID = 2;
+var TYPE_STAB_UP = 3;
+var TYPE_STAB_DOWN = 4;
+var TYPE_STAB_LEFT = 5;
+var TYPE_STAB_RIGHT = 6;
+var TYPE_PLAYER = 7;
 
 var tl = {};
 tl.x = width / 2 - XSIZE * 16;
@@ -53,11 +65,52 @@ function drawBound(x, y) {
 }
 
 function trimX(x) {
-    return (Math.floor((x - tl.x) / 32));
+    if (Math.floor((x - tl.x) / 32) < 0) {
+        return 0;
+    } else {
+        return Math.floor((x - tl.x) / 32);
+    }
 }
 
 function trimY(y) {
-    return (Math.floor((y - tl.y) / 32));
+    if (Math.floor((y - tl.y) / 32) < 0) {
+        return 0;
+    } else {
+        return Math.floor((y - tl.y) / 32);
+    }
+}
+
+function saveMap(map) {
+    var arr = [];
+    var str = {};
+    str = "";
+    for (var i = 0; i < XSIZE; i++) {
+        for (var j = 0; j < YSIZE; j++) {
+            arr.push(map[i][j].type);
+        }
+    }
+    for (var i = 0; i < arr.length; i += 2) {
+        var index = arr[i] * 8 + arr[i+1];
+        str = str + BASE64_CHARS.charAt(index);
+    }
+    trace(str);
+    return str;
+}
+
+function loadMap(str) {
+    for (var i = 0; i < XSIZE; i++) {
+        for (var j = 0; j < YSIZE; j++) {
+            var origin = str.charAt(Math.floor((i*YSIZE+j)/2));
+            var ch = BASE64_CHARS.indexOf(origin);
+            var t;
+            if ((i*YSIZE+j) % 2 == 0) {
+                t = Math.floor(ch / 8);
+            } else {
+                t = ch % 8;
+            }
+            placeObj(blocks, i, j, t);
+        }
+    }
 }
 
 function createBitmap(bitmapData, x, y, lifeTime, parent) {
@@ -199,7 +252,7 @@ function init() {
         }
         blocks.push(blocks_row);
     }
-    bmd_stab = loadBitmapData(32, 32, raw_stab);
+    bmd_stab_up = loadBitmapData(32, 32, raw_stab);
     bmd_player = loadBitmapData(22,22,raw_player);
     bmd_block = loadBitmapData(32, 32, raw_block);
 }
@@ -222,14 +275,6 @@ function createMainCanvas() {
         x: 0,
         y: 0,
         lifeTime: INT_MAX
-    });
-    // var e = StrToByteArr(player_bytes);
-    // var c = compress(e);
-    // trace(c);
-    var myshape = $.createShape({
-        alpha: 1,
-        lifeTime: INT_MAX,
-        parent: mainCanvas
     });
     g = $.createShape({lifeTime:2,x:-100,y:-100});
     g.graphics.moveTo(0, 0);
@@ -275,8 +320,8 @@ function placeObj(map, x, y, type) {
         map[x][y] = block;
     } else if (type == TYPE_EMPTY) {
         map[x][y] = block;
-    } else if (type == TYPE_STAB) {
-        var bmp_stab = createBitmap(bmd_stab, tl.x + x * 32, tl.y + y * 32, 0, mainCanvas);
+    } else if (type == TYPE_STAB_UP) {
+        var bmp_stab = createBitmap(bmd_stab_up, tl.x + x * 32, tl.y + y * 32, 0, mainCanvas);
         block.shape = bmp_stab;
         map[x][y] = block;
     };
@@ -294,13 +339,13 @@ function createMap() {
         };
     };
     
-    placeObj(blocks, 20, 13, TYPE_STAB);
+    placeObj(blocks, 20, 13, TYPE_STAB_UP);
 }
 
 function createDragModels() {
 
-    var static_stab = createBitmap(bmd_stab, tl.x + 22 * 32, tl.y + 13 * 32, 0, mainCanvas);
-    var dynamic_stab = createBitmap(bmd_stab, tl.x + 22 * 32, tl.y + 13 * 32, 0, mainCanvas);
+    var static_stab = createBitmap(bmd_stab_up, tl.x + 22 * 32, tl.y + 13 * 32, 0, mainCanvas);
+    var dynamic_stab = createBitmap(bmd_stab_up, tl.x + 22 * 32, tl.y + 13 * 32, 0, mainCanvas);
     var model = {};
     model.still = static_stab;
     model.move = dynamic_stab;
@@ -308,6 +353,26 @@ function createDragModels() {
     model.dragging = false;
     drag_models.push(model);
 
+}
+
+function createMainButtons() {
+    var a = $.createButton({
+        x:50,
+        y:0,
+        parent:mainCanvas,
+        text:"SAVE",
+        onclick:function(){
+      saveMap(blocks);
+    }});
+    var b = $.createButton({
+        x:width - 100,
+        y:0,
+        parent:mainCanvas,
+        text:"LOAD",
+        onclick:function(){
+            player.shape = null;
+      // loadMap("JJJJJJJJIAAAAABIIAAAAAJAIAAAABIAIAAAAJAAIAAABIAAIAAAJAAAIAABIAAAIAAJAAAAIABIAAAAIAJAAAAAIBIAAAAAIJAAAAAAJIAAAAAAJAAAAAABIAAAAAAJAAAAAABIAAAAAAJAAAAAABIAAAAADJJJJJJJJ");
+    }});
 }
 
 function keyDown(key) {
@@ -375,7 +440,7 @@ function checkGround() {
     for (i = start_i; i <= end_i; i++) {
         // trace(end_i);
         // trace(j);
-        if (blocks[i][j].type == TYPE_BLOCK) {
+        if (blocks[i][j].type == TYPE_BLOCK || blocks[i][j].type == TYPE_BLOCK_SOLID) {
             if (player.collisionBox.hitTestObject(blocks[i][j].shape)) {
                 hit = true;
             }
@@ -384,7 +449,7 @@ function checkGround() {
     if (!hit) {
         player.ySpeed += GRAVITY;
         for (i = start_i; i <= end_i; i++) {
-            if (blocks[i][j+1].type == TYPE_BLOCK) {
+            if (blocks[i][j+1].type == TYPE_BLOCK || blocks[i][j+1].type == TYPE_BLOCK_SOLID) {
                 if (y + player.ySpeed + 22 > blocks[i][j+1].shape.y) {
                     player.ySpeed = blocks[i][j+1].shape.y - y - 22;
                     break;
@@ -409,7 +474,7 @@ function checkCeiling() {
     for (i = start_i; i <= end_i; i++) {
         // trace(end_i);
         // trace(j);
-        if (blocks[i][j].type == TYPE_BLOCK) {
+        if (blocks[i][j].type == TYPE_BLOCK || blocks[i][j].type == TYPE_BLOCK_SOLID) {
             if (player.collisionBox.hitTestObject(blocks[i][j].shape)) {
                 hit = true;
             }
@@ -419,7 +484,7 @@ function checkCeiling() {
         // player.ySpeed += GRAVITY;
         // trace(j);
         for (i = start_i; i <= end_i; i++) {
-            if (blocks[i][j-1].type == TYPE_BLOCK) {
+            if (blocks[i][j-1].type == TYPE_BLOCK || blocks[i][j-1].type == TYPE_BLOCK_SOLID) {
                 if (y + player.ySpeed < blocks[i][j-1].shape.y + 32) {
                     player.ySpeed = y - 32 - blocks[i][j-1].shape.y;
                     break;
@@ -442,7 +507,7 @@ function checkCollision() {
         var end_j = Math.floor((y + 21 - tl.y) / 32);
         if (end_j < 0) { end_j = 0; };
         for (var j = start_j; j <= end_j; j++) {
-            if (blocks[i][j].type == TYPE_BLOCK) {
+            if (blocks[i][j].type == TYPE_BLOCK || blocks[i][j].type == TYPE_BLOCK_SOLID) {
                 // trace("hit");
                 player.xSpeed = 0;
             }
@@ -458,7 +523,7 @@ function checkCollision() {
         var end_j = Math.floor((y + 21 - tl.y) / 32);
         if (end_j < 0) { end_j = 0; };
         for (var j = start_j; j <= end_j; j++) {
-            if (blocks[i][j].type == TYPE_BLOCK) {
+            if (blocks[i][j].type == TYPE_BLOCK || blocks[i][j].type == TYPE_BLOCK_SOLID) {
                 player.xSpeed = 0;
             }
         };
@@ -470,22 +535,49 @@ function checkStab() {
     var y = player.collisionBox.y;
     var bmd1 = Bitmap.createBitmapData(1, 1);
     var p1 = (bmd1.rect).topLeft;
-    p1.x = blocks[20][13].shape.x;
-    p1.y = blocks[20][13].shape.y;
+    p1.x = 0;
+    p1.y = 0;
     var bmd2 = Bitmap.createBitmapData(1, 1);
     var p2 = (bmd2.rect).topLeft;
     p2.x = player.shape.x;
     p2.y = player.shape.y;
 
-    if (bmd_stab.hitTest(p1, 255, bmd_player, p2, 255)) {
-        trace("hit");
-        // $.root.removeEventListener("enterFrame", gameRunning);
-    } else {
-        // trace("miss");
-    }
+    var start_i = trimX(player.shape.x);
+    var end_i = trimX(player.shape.x + 22);
+    var start_j = trimY(player.shape.y);
+    var end_j = trimY(player.shape.y + 22);
+    for (var i = start_i; i <= end_i; i++) {
+        for (var j = start_j; j <= end_j; j++) {
+            if (blocks[i][j].type != TYPE_EMPTY) {
+                p1.x = blocks[i][j].shape.x;
+                p1.y = blocks[i][j].shape.y;
+            };
+            if (blocks[i][j].type == TYPE_STAB_UP) {
+                if (bmd_stab_up.hitTest(p1, 255, bmd_player, p2, 255)) {
+                    trace("hit");
+                    // $.root.removeEventListener("enterFrame", gameRunning);
+                }
+            } else if (blocks[i][j].type == TYPE_STAB_DOWN) {
+                // TODO
+            } else if (blocks[i][j].type == TYPE_STAB_LEFT) {
+                // TODO
+            } else if (blocks[i][j].type == TYPE_STAB_RIGHT) {
+                // TODO
+            };
+        };
+    };
+
 }
 
 function gameOver () {
+
+}
+
+function ready() {
+    init();
+    createBackground();
+    createMainCanvas();
+    createReadyButtons();
 
 }
 
@@ -493,61 +585,69 @@ function main() {
     init();
     createBackground();
     createMainCanvas();
-    createMap();
+
     createDragModels();
     createPlayer();
+    createMainButtons();
+}
 
-    $.frameRate = 40;
-    $.root.addEventListener("enterFrame", gameRunning);
-	Player.keyTrigger(function(key){
- 		keyDown(key);
-	},INT_MAX);
-	Player.keyTrigger(function(key){
- 		keyUp(key);
-	},INT_MAX,true);
+main();
+loadMap("JJJJJJJJIAAAAABIIAAAAAJAIAAAABIAIAAAAJAAIAAABIAAIAAAJAAAIAABIAAAIAAJAAAAIABIAAAAIAJAAAAAIBIAAAAAIJAAAAAAJIAAAAAAJAAAAAABIAAAAAAJAAAAAABIAAAAAAJAAAAAABIAAAAADJJJJJJJJ");
+var myTextField = $.createTextField("aaa", {x:100, y:100, lifeTime:INT_MAX});
+// myTextField.x = 100;
+// myTextField.y = 100;
+myTextField.text = "TEST";
+// myTextField.autoSize = TextFieldAutoSize.LEFT; 
 
-    // var bmp_stab = createBitmap(bmd_stab, tl.x + 22 * 32, tl.y + 13 * 32, 0, mainCanvas);
-    // var dragging = false;
-    $.root.mouseEnabled = true;
-    $.root.addEventListener("mouseMove", function (e) {
-        
+$.frameRate = 40;
+$.root.addEventListener("enterFrame", gameRunning);
+Player.keyTrigger(function(key){
+    keyDown(key);
+},INT_MAX);
+Player.keyTrigger(function(key){
+    keyUp(key);
+},INT_MAX,true);
 
-        for (var i = 0; i < drag_models.length; i++) {
-            if (drag_models[i].dragging) {
-                drag_models[i].move.alpha = 1;
-                drag_models[i].move.x = e.localX - 16;
-                drag_models[i].move.y = e.localY - 16;
-                if (blocks[trimX(e.localX)][trimY(e.localY)].type == TYPE_EMPTY) {
-                    drawBound(trimX(e.localX), trimY(e.localY)); 
-                } else {
-                    drawBound(-100, -100); 
-                }
-            };
-        }
+$.root.mouseEnabled = true;
+$.root.addEventListener("mouseMove", function (e) {
+    
 
-        for (var i = 0; i < drag_models.length; i++) {
-            if ((e.localX > drag_models[i].still.x) && (e.localX < drag_models[i].still.x + 32) 
-            && (e.localY > drag_models[i].still.y) && (e.localY < drag_models[i].still.y + 32)) {
-                drag_models[i].still.alpha = 0.5;
+    for (var i = 0; i < drag_models.length; i++) {
+        if (drag_models[i].dragging) {
+            drag_models[i].move.alpha = 1;
+            drag_models[i].move.x = e.localX - 16;
+            drag_models[i].move.y = e.localY - 16;
+            if (blocks[trimX(e.localX)][trimY(e.localY)].type != TYPE_EMPTY) {
+                drawBound(trimX(e.localX), trimY(e.localY)); 
             } else {
-                drag_models[i].still.alpha = 1;
+                drawBound(-100, -100); 
             }
         };
-        
-    });
-    $.root.addEventListener("mouseUp", function (e) {
-        for (var i = 0; i < drag_models.length; i++) {
-            if (!drag_models[i].dragging && (drag_models[i].still.alpha == 0.5)) {
-                drag_models[i].dragging = true;
-            } else if (drag_models[i].dragging) {
-                if (blocks[trimX(e.localX)][trimY(e.localY)].type == TYPE_EMPTY) {
-                    placeObj(blocks, trimX(e.localX), trimY(e.localY), TYPE_STAB);
-                }
-                drag_models[i].dragging = false;
-                drag_models[i].move.alpha = 0;
-                drawBound(-100, -100);
-            };
+    }
+
+    for (var i = 0; i < drag_models.length; i++) {
+        if ((e.localX > drag_models[i].still.x) && (e.localX < drag_models[i].still.x + 32) 
+        && (e.localY > drag_models[i].still.y) && (e.localY < drag_models[i].still.y + 32)) {
+            drag_models[i].still.alpha = 0.5;
+        } else {
+            drag_models[i].still.alpha = 1;
+        }
+    };
+    
+});
+$.root.addEventListener("mouseUp", function (e) {
+    for (var i = 0; i < drag_models.length; i++) {
+        if (!drag_models[i].dragging && (drag_models[i].still.alpha == 0.5)) {
+            drag_models[i].dragging = true;
+        } else if (drag_models[i].dragging) {
+            if (blocks[trimX(e.localX)][trimY(e.localY)].type != TYPE_EMPTY) {
+                placeObj(blocks, trimX(e.localX), trimY(e.localY), TYPE_EMPTY);
+                main();
+                loadMap(saveMap(blocks));
+            }
+            drag_models[i].dragging = false;
+            drag_models[i].move.alpha = 0;
+            drawBound(-100, -100);
         };
-    });
-}
-main();
+    };
+});
