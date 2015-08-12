@@ -40,6 +40,7 @@ var alphaCanvas = {};
 var allowCopy = false;
 var c;
 var hint;
+var traps = [];
 var takeRandomField;
 var sound =  Player.createSound("btnover");
 var width = Player.width;
@@ -51,12 +52,12 @@ var EDIT_MODE = 1;
 var PLAY_MODE = 0;
 var CURRENT_MODE = {};
 var MAP_TO_LOAD = "";
-var GRAVITY_ORIGIN = 1.96;
-var GRAVITY_FLOAT = 0.62;
+var GRAVITY_ORIGIN = 1.24;
+var GRAVITY_FLOAT = 0.42;
 var GRAVITY = GRAVITY_ORIGIN;
-var JUMP_SPEED = -10;
+var JUMP_SPEED = -8;
 var MAX_JUMP_POWER = 2;
-
+var X_SPEED = 5;
 var TYPE_EMPTY = 0;
 var TYPE_BLOCK = 1;
 var TYPE_BLOCK_SOLID = 2;
@@ -66,6 +67,11 @@ var TYPE_STAB_LEFT = 5;
 var TYPE_STAB_RIGHT = 6;
 var TYPE_PLAYER = 7;
 var TYPE_DESTINATION = 8;
+var TYPE_TRAP_UP = 9;
+var TYPE_TRAP_DOWN = 10;
+var TYPE_TRAP_LEFT = 11;
+var TYPE_TRAP_RIGHT = 12;
+
 
 var tl = {};
 tl.x = width / 2 - XSIZE * 16;
@@ -229,18 +235,24 @@ function drawBound(x, y) {
 }
 
 function trimX(x) {
-    if (Math.floor((x - tl.x) / 32) < 0) {
+	var res = Math.floor((x - tl.x) / 32);
+    if (res < 0) {
         return 0;
+    } else if (res >= XSIZE){
+        return XSIZE - 1;
     } else {
-        return Math.floor((x - tl.x) / 32);
+    	return res;
     }
 }
 
 function trimY(y) {
-    if (Math.floor((y - tl.y) / 32) < 0) {
+	var res = Math.floor((y - tl.y) / 32);
+    if (res < 0) {
         return 0;
+    } else if (res >= YSIZE) {
+        return YSIZE - 1;
     } else {
-        return Math.floor((y - tl.y) / 32);
+    	return res;
     }
 }
 
@@ -425,6 +437,7 @@ function createMainCanvas() {
         lifeTime: INT_MAX
     });
 
+
     g = $.createShape({lifeTime:2,x:-100,y:-100});
     g.graphics.moveTo(0, 0);
     g.graphics.lineStyle(2, 0xFF4040, 1, false);
@@ -530,8 +543,39 @@ function placeObj(map, x, y, type) {
     	destination.x = tl.x + x * 32;
     	destination.y = tl.y + y * 32;
     	map[x][y] = block;
-    }
-
+    } else if (type == TYPE_TRAP_UP) {
+    	var bmp = createBitmap(bmd_stab_down, tl.x + x * 32, tl.y + y * 32, 0, mainCanvas);
+    	bmp.alpha = 0.5;
+        if (CURRENT_MODE == PLAY_MODE) {
+        	bmp.alpha = 0;
+        };
+        block.shape = bmp;
+        map[x][y] = block;
+    } else if (type == TYPE_TRAP_DOWN) {
+    	var bmp = createBitmap(bmd_stab_up, tl.x + x * 32, tl.y + y * 32, 0, mainCanvas);
+    	bmp.alpha = 0.5;
+    	if (CURRENT_MODE == PLAY_MODE) {
+        	bmp.alpha = 0;
+        };
+        block.shape = bmp;
+        map[x][y] = block;
+    } else if (type == TYPE_TRAP_LEFT) {
+    	var bmp = createBitmap(bmd_stab_right, tl.x + x * 32, tl.y + y * 32, 0, mainCanvas);
+    	bmp.alpha = 0.5;
+    	if (CURRENT_MODE == PLAY_MODE) {
+        	bmp.alpha = 0;
+        };
+        block.shape = bmp;
+        map[x][y] = block;
+    } else if (type == TYPE_TRAP_RIGHT) {
+    	var bmp = createBitmap(bmd_stab_left, tl.x + x * 32, tl.y + y * 32, 0, mainCanvas);
+    	bmp.alpha = 0.5;
+    	if (CURRENT_MODE == PLAY_MODE) {
+        	bmp.alpha = 0;
+        };
+        block.shape = bmp;
+        map[x][y] = block;
+    } 
 }
 
 
@@ -639,10 +683,105 @@ function createDragModels() {
     (model.move).alpha = 0;
     model.dragging = false;
     drag_models.push(model);
+    createText("终点", {x: tl.x + 22.5 * 32, y: tl.y + 14 * 32});
 
+    var still = $.createShape({
+    	x: tl.x - 1.5 * 32,
+    	y: tl.y + 1 * 32,
+        lifeTime: INT_MAX,
+        parent: mainCanvas
+    });
+	fillRect(still, 0, 0, 32, 32, 0xaaaa33);
+	var move = $.createShape({
+    	x: tl.x - 1.5 * 32,
+    	y: tl.y + 1 * 32,
+        lifeTime: INT_MAX,
+        parent: mainCanvas
+    });
+	fillRect(move, 0, 0, 32, 32, 0xaaaa33);
+	var model = {};
+    model.still = still;
+    model.move = move;
+    model.type = TYPE_TRAP_LEFT;
+    (model.move).alpha = 0;
+    model.dragging = false;
+    drag_models.push(model);
+    createText("左坑", {x: tl.x - 1.5 * 32, y: tl.y + 2 * 32});
+
+    var still = $.createShape({
+    	x: tl.x - 1.5 * 32,
+    	y: tl.y + 2.5 * 32,
+        lifeTime: INT_MAX,
+        parent: mainCanvas
+    });
+	fillRect(still, 0, 0, 32, 32, 0x00aa00);
+	var move = $.createShape({
+    	x: tl.x - 1.5 * 32,
+    	y: tl.y + 2.5 * 32,
+        lifeTime: INT_MAX,
+        parent: mainCanvas
+    });
+	fillRect(move, 0, 0, 32, 32, 0x00aa00);
+	var model = {};
+    model.still = still;
+    model.move = move;
+    model.type = TYPE_TRAP_RIGHT;
+    (model.move).alpha = 0;
+    model.dragging = false;
+    drag_models.push(model);
+    createText("右坑", {x: tl.x - 1.5 * 32, y: tl.y + 3.5 * 32});
+
+    var still = $.createShape({
+    	x: tl.x - 1.5 * 32,
+    	y: tl.y + 4 * 32,
+        lifeTime: INT_MAX,
+        parent: mainCanvas
+    });
+	fillRect(still, 0, 0, 32, 32, 0xCC0033);
+	var move = $.createShape({
+    	x: tl.x - 1.5 * 32,
+    	y: tl.y + 4 * 32,
+        lifeTime: INT_MAX,
+        parent: mainCanvas
+    });
+	fillRect(move, 0, 0, 32, 32, 0xCC0033);
+	var model = {};
+    model.still = still;
+    model.move = move;
+    model.type = TYPE_TRAP_UP;
+    (model.move).alpha = 0;
+    model.dragging = false;
+    drag_models.push(model);
+    createText("上坑", {x: tl.x - 1.5 * 32, y: tl.y + 5 * 32});
+
+    var still = $.createShape({
+    	x: tl.x - 1.5 * 32,
+    	y: tl.y + 5.5 * 32,
+        lifeTime: INT_MAX,
+        parent: mainCanvas
+    });
+	fillRect(still, 0, 0, 32, 32, 0xCC9933);
+	var move = $.createShape({
+    	x: tl.x - 1.5 * 32,
+    	y: tl.y + 5.5 * 32,
+        lifeTime: INT_MAX,
+        parent: mainCanvas
+    });
+	fillRect(move, 0, 0, 32, 32, 0xCC9933);
+	var model = {};
+    model.still = still;
+    model.move = move;
+    model.type = TYPE_TRAP_DOWN;
+    (model.move).alpha = 0;
+    model.dragging = false;
+    drag_models.push(model);
+    createText("下坑", {x: tl.x - 1.5 * 32, y: tl.y + 6.5 * 32});
+
+    createText("左坑、右坑。。。是指触发后左侧、右侧。。。一格飞入刺", {x: tl.x + 4 * 32, y: tl.y + 15 * 32, color: 0x000000});
 }
 
 function createReadyButtons() {
+	createText("加入了隐藏刺，创造属于你自己的地图吧\n别忘了让别人来玩哦\n(已修复：跳\"克星\")\n若显示太乱，可调节弹幕透明度", {x: tl.x, y: 20, size: 30, color: 0xCC6633});
 	var but = $.createButton({
         x:width / 2 - 50,
         y:height / 2 - 100,
@@ -688,7 +827,13 @@ function createReadyButtons() {
         		lifeTime:INT_MAX
             });
             c.font = "微软雅黑";
-
+            var b = $.createButton({
+		        x:width - 100,
+		        y:0,
+		        text:"返回主菜单",
+	        onclick:function(){
+	        	ready();
+	       	}});
 		}
   	});
 
@@ -757,10 +902,12 @@ function createEditButtons() {
         parent:GUICanvas,
         text:"编辑",
         onclick:function(){
+        	drag_models.length = 0;
         	main(EDIT_MODE);
             $.root.removeEventListener("enterFrame", gameRunning);
             loadMap(MAP_TO_LOAD);
             createDragModels();
+
        	}});
 }
 
@@ -778,10 +925,10 @@ function keyDown(key) {
         };
 	};
 	if (key == 65) {
-		player.xSpeed = -3;
+		player.xSpeed = -X_SPEED;
 	};
 	if (key == 68) {
-		player.xSpeed = 3;
+		player.xSpeed = X_SPEED;
 	};
 }
 
@@ -800,6 +947,8 @@ function keyUp(key) {
 
 function gameRunning() {
 
+	trapMove();
+	// trace("here");
 	checkDestination();
     // the order is important!
     checkCollision();
@@ -807,6 +956,66 @@ function gameRunning() {
     checkStab();
     checkGround();
     checkCeiling(); 
+    checkTrap();
+}
+
+function trapMove() {
+	// trace(traps.length);
+	var x = player.collisionBox.x;
+    var y = player.collisionBox.y;
+    var bmd1 = Bitmap.createBitmapData(1, 1);
+    var p1 = (bmd1.rect).topLeft;
+    p1.x = 0;
+    p1.y = 0;
+    var bmd2 = Bitmap.createBitmapData(1, 1);
+    var p2 = (bmd2.rect).topLeft;
+    p2.x = player.shape.x;
+    p2.y = player.shape.y;
+	for (var i = traps.length - 1; i >= 0; i--) {
+		// trace(traps[i].shape.x);
+		if ((traps[i].shape.x < width) && (traps[i].shape.x > -32) 
+			&& (traps[i].shape.y < height) && (traps[i].shape.y > -32) ) {
+			if (traps[i].type == TYPE_TRAP_DOWN) {
+				traps[i].shape.y -= 5;
+			} else if (traps[i].type == TYPE_TRAP_UP) {
+				traps[i].shape.y += 5;
+			} else if (traps[i].type == TYPE_TRAP_LEFT) {
+				traps[i].shape.x += 5;
+			} else if (traps[i].type == TYPE_TRAP_RIGHT) {
+				traps[i].shape.x -= 5;
+			}
+			p1.x = traps[i].shape.x;
+			p1.y = traps[i].shape.y;
+			if (traps[i].type == TYPE_TRAP_DOWN) {
+                if (bmd_stab_up.hitTest(p1, 255, bmd_player, p2, 255)) {
+                    gameOver();
+                }
+            } else if (traps[i].type == TYPE_TRAP_UP) {
+                if (bmd_stab_down.hitTest(p1, 255, bmd_player, p2, 255)) {
+                    gameOver();
+                }
+            } else if (traps[i].type == TYPE_TRAP_RIGHT) {
+                if (bmd_stab_left.hitTest(p1, 255, bmd_player, p2, 255)) {
+                    gameOver();
+                }
+            } else if (traps[i].type == TYPE_TRAP_LEFT) {
+                if (bmd_stab_right.hitTest(p1, 255, bmd_player, p2, 255)) {
+                    gameOver();
+                }
+            };
+		} else {
+			traps[i].shape.alpha = 0;
+			var n = 0;
+			for(var j=0;j<traps.length;j++) 
+		    { 
+		        if(traps[j]!=traps[i]) 
+		        { 
+		            traps[n++]=traps[j];
+		        } 
+		    } 
+		    traps.length-=1;
+		}
+	};
 }
 
 function checkDestination() {
@@ -833,6 +1042,51 @@ function movePlayer() {
     
     player.collisionBox.x = player.shape.x;
     player.collisionBox.y = player.shape.y;
+}
+
+function checkTrap() {
+	var hit = false;
+    var x = player.collisionBox.x;
+    var y = player.collisionBox.y;
+    var start_i = trimX(player.shape.x);
+    var end_i = trimX(player.shape.x + 22);
+    var start_j = trimY(player.shape.y);
+    var end_j = trimY(player.shape.y + 22);
+    var TRAP_TYPE;
+    // trace("here");
+    var i, j;
+    for (i = start_i; i <= end_i; i++) {
+    	for (j = start_j; j <= end_j; j++) {
+    		// trace(blocks[i][j].type);
+    		if (blocks[i][j].type >= TYPE_TRAP_UP && blocks[i][j].type <= TYPE_TRAP_RIGHT) {
+	        	// trace(blocks[i][j].shape.x);
+	            if (player.collisionBox.hitTestObject(blocks[i][j].shape)) {
+	            	TRAP_TYPE = blocks[i][j].type;
+        	    	blocks[i][j].shape.alpha = 0;
+        	    	if (TRAP_TYPE == TYPE_TRAP_LEFT) {
+		    			var bmp = createBitmap(bmd_stab_right, tl.x + (i - 1) * 32, tl.y + j * 32, 0, mainCanvas);
+		        		traps.push({type: TRAP_TYPE, shape: bmp});
+        	    	} else if (TRAP_TYPE == TYPE_TRAP_RIGHT) {
+		    			var bmp = createBitmap(bmd_stab_left, tl.x + (i + 1) * 32, tl.y + j * 32, 0, mainCanvas);
+		        		traps.push({type: TRAP_TYPE, shape: bmp});
+        	    	} else if (TRAP_TYPE == TYPE_TRAP_UP) {
+		    			var bmp = createBitmap(bmd_stab_down, tl.x + i * 32, tl.y + (j - 1) * 32, 0, mainCanvas);
+		        		traps.push({type: TRAP_TYPE, shape: bmp});
+        	    	} else if (TRAP_TYPE == TYPE_TRAP_DOWN) {
+		    			var bmp = createBitmap(bmd_stab_up, tl.x + i * 32, tl.y + (j + 1) * 32, 0, mainCanvas);
+		        		traps.push({type: TRAP_TYPE, shape: bmp});
+        	    	}
+			        placeObj(blocks, i, j, TYPE_EMPTY);
+	            	trace("hit");
+	                hit = true;
+	                break;
+	            }
+	        };
+    	};
+    };
+    // if (hit) {
+
+    // }
 }
 
 function checkGround() {
@@ -991,8 +1245,12 @@ function gameOver () {
         parent:GUICanvas,
         text:"重新开始",
         onclick:function(){
-	      	main(CURRENT_MODE);
-	      	loadMap(MAP_TO_LOAD);
+        	if (CURRENT_MODE == EDIT_MODE) {
+        		createText("请点编辑", {x: width / 2 - 40, y: height / 2 - 40, size: 30});
+        	} else {
+		      	main(CURRENT_MODE);
+		      	loadMap(MAP_TO_LOAD);
+		      }
     }});
 }
 
@@ -1013,6 +1271,29 @@ function ready() {
 
 
 }
+
+var dispatcher = {};
+dispatcher.added = function(e) {
+	var comment = e.target;
+	if (!comment.hasOwnProperty('data') || !comment.data.hasOwnProperty('text')) {
+        return;
+    }
+    trace(comment.data.text);
+};
+var len = $.root.numChildren;
+for (var i = 0; i < len; ++i) {
+    var child = $.root.getChildAt(i);
+    if (!child.hasOwnProperty('data') || !child.data.hasOwnProperty('text')) {
+        continue;
+    }
+    trace(i);
+    trace(child.data.text);
+    dispatcher.added({
+        target: child
+    });
+}
+$.root.addEventListener('added', dispatcher.added);
+
 
 Player.commentTrigger(function(data){
 	trace("input");
