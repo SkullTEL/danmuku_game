@@ -10,6 +10,9 @@ var raw_block_solid = "jVdZV1vnFZUECASSkJDQeDUgxCSBhAHNA0IgDBiChwzOcmIDnidct7Fjp
 var raw_player = "jZVZTJRXFMc-Zx9mcViEgRlnicyIUpCGALWIC7jw0BqDQQVFBURqy5JgKwoVKLVqgxCMS0VqLS-UBWxVaGuqYxptY1MLbn1o2oemiU37ZCPEMmy-XgYyVQHh4Z-vnnv+53-vPd+550qA9ByInTcPSZLQKdTolQqMCjmBciUhcjUzpBlYzBH09Q9IE8ROBgYFXomOIkYtsdwZxiqnkZWOANLtJtbOd7JijgOtQkF8YiI9vb3T0vQODrF4yVISQhXkuNVsiwlim0vHG9EGcoW9xaUlP9pCeuRs33li4xYwNA3df-sHfPykWUoedtbxz80m-u5o4NHNFn5pO0BOpJoNEUoKXrKwQC9Dr9GKvQxPqTs0PIxeZ8RqUPHwh1aqtq-l3qWjFG9eT1-XF2Ktg2TF6MmxatjoCkWSyVmcupLhoaEptbu777E0JZGvmypYFu3gclMxsXYzPZ7j8Ecr6+abyAySfDmK1UoYlCr6+vqnleeVy1K421LBk+6L8NvH9N44Br93wl9XuH+yhjyXiawoE2kmGTZzKN6BKWuDR4+fkJq2kPtttVTt2EZGWjIlGemsWrSITauT8d47RemSlzGrVVjDjFz78ftp19q6ten86Wnw-cOncfbDQpGLi7gdFp9dEZMwqUZubi5bt24hPz+fgu2FZOfkYg6dRd7ryXR9eYzbVw7huVDFz1frYOAGe3My-OtkGgO4XV46oe7ze3oae0syadidTXFWKmWb0ti42u2b15g3ojVnirGGOGFfr3xnnO7ZM2c4f76N1tZWwkKCJ9CP5nRtHidr3xRjq4CKMFMhbtvnaIMLxL2WqBf4rrp60pwkJyXSeqSKU-tKxjRNzJ57hNMN1zja0InD1oHWtAat8GlnxiNpKgWniHRJywkx923d-nGaj3t6kUlKjr1bIKxfufFZJSFGJzr9yP87IfABRls7EVGXkIwphAYFcfnTqxzcfd63h1MCzQLfNNaP066rP+zjZC+3s78sE2uwTZwzAZUmVfSa5ciUy1CoM5Bp1xBosPJTS5GI8tC0bwcbAnScFrFHBG7WNY7Tbmw8zua8t1i3PhtT2Ex0Thsm+xwCzW6C7PMxO8IJFr1OLR-Nf0t9hYh6QLzbxh5hfyWwa8TxgjoecatCFhC5qY652Y1EZtcQnLBK9GIFr2oMBEoyH6emLJ+4cDMHxPxhYRdOoftJczM6ca8kyYAkjxTf0XpxyXW8ppxFplqPdaxuggW2Cpwr3MGFPRUT6nk81znX1satW7eIcrt4r3oXb5cVsXNnKc2Nh1gYasKlkuMU+0uabaHjo6N0lpfTse-9CfWGRZ9sb29-pn5nGg10d3X5OV137mA0Gv3+8AgLdx-cf+G5+7xeP18loBgbqxVKP0epUo2+feKd04z5R+7GwOQ9DW9-P5bwcB9XO+P-OKfN7uc4HA7fXMDIemN+a0QEA4ODz2gJx38J";
 var raw_rubber = "3Zd5UJRlHMeXADkEQQhEDkOQa1m8GBHBC1FYYBdWEylWBLkkBGJCVlDIFkFJMBtTwTzRJp2MQ0DJtGy8JgExr2k0b7MJlQU8AEX49nsfpQkP3GXEZvzjmXln33efz-f3-R3v8-IA8N6Sha8KNyJreT5a2h69cXZ4dCy8Jo9EhFQIUaAfMpfmovleyxthS0JCERkmBO6fAB6ewcHy1QgPFWKqrzcWy5dB0Xy-z9hBxI6LEgPNtfjz3B6crylG45WfSUsdDu1ZS374wdvHG+lLsnFHcbcP2IHErsENYv9xohSXTpbhYl0pXZdAceUn0nESR6sKEDnbn-mRmiGnvDx4DZ5LERdJcTd1Z-93XawrYzoaLj-RceyHQsREiCGW+GHT1iJ0dHT0ii2dG4V5c0U9sp-Vcb62GE3XDtK-byEwwBM8Hg9tbW0qs8PmRmN+jISubuLOpQMs3z2xu-Jx9XQ5OhuOY8OaJRhqa47E5CSV2SmyVKY7MGgatm3IQRNXZ0-r7gL53BO7-dYx5C1bgM8y4pEhi0TtyVMqsVPTZIxtL3CCkbkFNPQN4D1tIraTjvs3fnmSi7OV3XRw7GunK-Co-ihWfS4jdiKqfyxA5qfpvWLb8R3gPNIFziMEcBruDH0TU-QbMBC+fl7YsSUXLTcPA43VuH6GdFC+r5+twMO-j+KLXBlkKdG00+9YtCAcu8qqVGYP49szNsftWs4jBXB04aO-sQm0DI0QIJqK77fnEfMIoKgmPYewPCsZ6bJY0lWD4-sLMS8+Fp1KsmXpC1-KflaHg4APXaN3oTPQGNNn+OHwvs3Ip3wvXhiHZq7u204hOX4WdhaXK8VOW7xIKXZ3HS6wd3aCmo4+07FyeSrzv+Wvwziydw3i4mPwuOPV7PUbv2ZsSxtrqjc++E-z3dPij3AmD5xIryNMrKwQHByAzju-ov7CPvZeiI4Q4bvSyleyFQoFTCzMYGVjBaH-FLiOdYUx1ftQBzvm84vZAorbEVa2NvAResHG0Q67tq2gzWqAB79h4cchmCUNU8p3efZSFju3p8dEd8wJm4GP4kLh5jEGOpTfIXa23fLBPWdHMZtSzGH07Ljxbhg-aRyartJseHwOORlRcPUcj-rbileyGxsbKQZrWFhbsX0tKZ5hTg6QSiXIXpJE-Tsf7p5u1PuGsLAZCpdRw5nfBqaDkJwUgYT42aRdnfU60ICczCiMHueJhqZ7SsW+Ij+PxS6gfbti4-rL0GwwizH1kygUrc-G6vw0eExwB09DGzxtPSyTJ2NFTgqbBdxz3AxYuyoFrh7EblSO3draCkeqtUGWg5+rN85vbl9t6nHunjwzEfvL1kGekYDNBVnYsTmXasQcPE1drPsyAyVFcowhz1V432PDpo0s9p56TUD3bBztwdPSZd5zM1dx+QCrT26NchuNcKkvgj+cidsNzSrNWDePsTA0NVaq1ziN6noGKP5mJZIS5kBzgCH7TVtfCyJJIJruqnS+wLc7d5B3akqxuTVkmC2dZSZhS2EW+eHAZh9PjQc-sYjmS6dK7Pb2dtg62f3bc8rMOn2TQUhJjqTZOo-NXI4tmh7Yq7MMnYFQXFoC3wAh3tHWhJa+Lqv5l+ng5pzZe0PY+8yf3jec7l6yn9NSursMQrE-1HU4HTqsH57Vwc2DCZM9EBUZwtji18PupmN3RTn8g0TQ0O2Hfno6bK536eBmrDjIB2YWRpg4xbtPvysq9lSyetbsr0VLm+lg88hYD5KZ09-Yt9Xeqr0Iel-C8sJ5PvOD4P-l+5LzY0vRVt7b9M1Mhv4D";
 var raw_player2 = "jZVZTJRXFMc-Zh9mcWAQBmYYZiIzIhS0MUAt4gIIPLTGQEBFURaR2ook2LpgBUqp2iAE41KRWsoLVQFbFdqaKqaRNja14NaHpn1omti0TzZCLPuvl5FMpBOUh3++u5z7O+eee+-5JECaRQyPjmG1hOEn+REkVxMgV2JUyNErFegUaiRJIm7RIuk5DB-m4NAQSxMS0CoUrFngIDvaSWaEiXSHPxlOI2nOEGLVEq-ERDE+R+aEUNySxZ54MiPDKY6xstWlpdCt5o0YA9tcOrbFBpIv+vHBClasXMXI+MQLuSPjk+g1WhbrZZS8ZGVDmJL8SDW-dB7mUV8bf3c38k9fMw976kmcr-T4-3d07LnMyYkJVqSkI8nkbHIFk2-TsDFWLxhHGO7-grIt67l3+QRV27N5+EM7NoMKvc7IxOTkc7nDw6MYlCritJJnrzmBErnRJvijncHeU8RFWLjSXMbqGAdfN1eyKjmBgYF7L87B2Bh2SzCpJhkbo0wUuUzcP1MDf12F33sYunkSfvuYJwOXuNtWSfrq5Dnfhes-fo8txIhFraJ85cuM3DvL5rVJZCxfzq6sTLJSk6jasY37nbWkpC7j0eMnc2ZXxsZ7zsPtsIocXOL8h6We-rP6s7eR3OzMOTNv7y0nx+jvXX8wPwvGbvLztXp6L1Zx++pR+r88SdHrSViC55OXX0jJ9lKKi4spKNhKYWGhD-PGgXdY4uFp0Fpy0Fg2edib1rqp2JxK2cYUGvflcXBXjk-8z2gG87vqahrEkJ+Q1lyC2-45Iaap-auEbJypfZPW2iLRjvFhhQSZaW9vp6Ojk-PnznmZ39Yf4vTU+5K0wm4nkuYA2nlL0U75MK3DYe-mRGMPrY3XCV94XNiYPLyzdbtoP15FUmKCz96-aWqgZcpm2veRfR1c+fQawYGBSMZkwqIuY7R3ibkPhE6j0zcSZHRy87MDYvWvnHy3BJmk5PHgkJfZV9-EccFqFdrgr6O5bocY7eWntp0EGGzItOtQqLOQKVeLGpSGSpMi8hSPzWznUEUOeWkRnljqG47NiHWPGPtKaL-QUrddjDygraHSY6uWS5hFzbI4QgmMiCbA4sYUsQCd044pZB656-PYUvQWTU2nfHJQKtYfEzosV7Ak1EJNRbGHGSDJeFVjEDVXgTk+g8i8GhbmNRG5uR5V0OL-n7kP9+L+Si6U7qBAmJmn82sTylHreU05H5dcN33mZiR5pPga0Il3+ElLy5zeQnfd+-Ts3Uv3RydIDLfiFHG6VHKWBZtoaTrK7t3lvF2xk-eq9xDldnHr1i0udHbS23tjTvy7D+4TGmb13kuj0Uj-nTve+YH+fuYZDTPubldXF5Oz10nGRC3zm7bVCOnEf22qrVSpvDZqxdM6rhBSPcMeHhmZnTs+ji0s7OldEPKfXuNwOLw2TnuE16-W76lfa2goI6OjM1hi4j9i";
+var map1 = "`JcyxDcJQEANQ2xES+qGwKH91ugkQy9JGTBA2YDRM4u5Zll8GgQdZNlQi37c+gPqQ2p6rg3FC8G4sxW5td4ysVoDqwgVBH8njmDPMc+IxbZ3I0NPSf1b4prn+ALn+";
+var map2 = "`TYwxCgAgDANPKrr2Kbo5+v9XWRsEAy1NcpQCdOfKYuJaMOUVTzUBjgSMB1SZJq6wY29PTACvMb0bmRmf-ACf";
+var map3 = "`c2BgYGBUVAGRDEIMILAQynEAUgKMEA6zA4hkWAKUdQBxuETAHEZkDn4ZBjBnAQ+Qc4CZQ4CBYdGEBUAZhg3MAA3M";
 var mainCanvas;
 var GUICanvas;
 var blackCurtain;
@@ -71,7 +74,7 @@ var TYPE_TRAP_UP = 9;
 var TYPE_TRAP_DOWN = 10;
 var TYPE_TRAP_LEFT = 11;
 var TYPE_TRAP_RIGHT = 12;
-
+var MAX_FALLING_SPEED = 25;
 
 var tl = {};
 tl.x = width / 2 - XSIZE * 16;
@@ -414,7 +417,7 @@ function init() {
     // var a = StrToByteArr(player_bytes);
     // var b = compress(a);
     // trace(b);
-
+    traps.length = 0;
 }
 
 function createBackground() {
@@ -456,11 +459,7 @@ function createMainCanvas() {
 }
 
 function createGUICanvas() {
-	GUICanvas = $.createCanvas({
-        x: 0,
-        y: 0,
-        lifeTime: INT_MAX
-    });
+	GUICanvas = createCanvas({x:0, y:0});
 }
 
 function createPlayer() {
@@ -782,31 +781,53 @@ function createDragModels() {
 
 function createReadyButtons() {
 	createText("加入了隐藏刺，创造属于你自己的地图吧\n别忘了让别人来玩哦\n(已修复：跳\"克星\")\n若显示太乱，可调节弹幕透明度", {x: tl.x, y: 20, size: 30, color: 0xCC6633});
-	var but = $.createButton({
+	var but1 = $.createButton({
+        x:width / 2 - 200,
+        y:height / 2 - 100,
+        parent:GUICanvas,
+        color: 0xFFD700,
+        text:"想要被勾引？\n作者：左岸出品",
+        onclick:function(){
+        	CURRENT_MODE = PLAY_MODE;
+			MAP_TO_LOAD = map1;
+			main(PLAY_MODE);
+			loadMap(MAP_TO_LOAD);
+		},
+		lifeTime: 0
+  	});
+  	but1.width = 100;
+
+  	var but1 = $.createButton({
         x:width / 2 - 50,
         y:height / 2 - 100,
         parent:GUICanvas,
         color: 0xFFD700,
-        text:"试试手气?",
+        text:"考验底力\n作者：陆仁岬",
         onclick:function(){
-			var map = rollMap();
-			trace(map);
-	    	if (map == null) {
-		        var hint = $.createComment("目前没人贡献地图哦", {
-		        	x:width / 2 - 4.5 * 30,
-		    		y:height / 2 - 150,
-		    		fontsize: 30,
-		    		color: 0xFFD700,
-		    		lifeTime:3
-		        });
-		        hint.font = "微软雅黑";	
-	    	} else {
-	    		CURRENT_MODE = PLAY_MODE;
-	    		main(PLAY_MODE);
-	    		loadMap(map);
-	    	}
-		}
+        	CURRENT_MODE = PLAY_MODE;
+			MAP_TO_LOAD = map2;
+			main(PLAY_MODE);
+			loadMap(MAP_TO_LOAD);
+		},
+		lifeTime: 0
   	});
+  	but1.width = 100;
+
+  	var but1 = $.createButton({
+        x:width / 2 + 100,
+        y:height / 2 - 100,
+        parent:GUICanvas,
+        color: 0xFFD700,
+        text:"抖M大师?\n作者：处虚嘲幻",
+        onclick:function(){
+        	CURRENT_MODE = PLAY_MODE;
+			MAP_TO_LOAD = map3;
+			main(PLAY_MODE);
+			loadMap(MAP_TO_LOAD);
+		},
+		lifeTime: 0
+  	});
+  	but1.width = 100;
 
 	var a = $.createButton({
         x:width / 2 - 50,
@@ -834,7 +855,8 @@ function createReadyButtons() {
 	        onclick:function(){
 	        	ready();
 	       	}});
-		}
+		},
+		lifeTime: 0
   	});
 
     var b = $.createButton({
@@ -849,7 +871,8 @@ function createReadyButtons() {
             createEmptyMap();
             MAP_TO_LOAD = saveMap(blocks);
             createDragModels();
-        }
+        },
+        lifeTime: 0
     });
 }
 
@@ -863,7 +886,8 @@ function createMainButtons() {
         onclick:function(){
 	      	main(PLAY_MODE);
 	      	loadMap(MAP_TO_LOAD);
-  		}
+  		},
+  		lifeTime: 0
 	});
 	var b = $.createButton({
         x:width - 100,
@@ -872,7 +896,9 @@ function createMainButtons() {
         text:"返回主菜单",
         onclick:function(){
         	ready();
-       	}});
+       	},
+       	lifeTime: 0
+       });
 }
 
 function createEditButtons() {
@@ -883,8 +909,10 @@ function createEditButtons() {
         color: 0xFFD700,
         text:"返回主菜单",
         onclick:function(){
-      ready();
-    }});
+	      ready();
+	    },
+	    lifeTime: 0
+		});
     var b = $.createButton({
         x:width / 2  - 50,
         y:0,
@@ -895,7 +923,9 @@ function createEditButtons() {
         	main(EDIT_MODE);
         	loadMap(MAP_TO_LOAD);
         	$.root.addEventListener("enterFrame", gameRunning);
-       	}});
+       	},
+       	lifeTime: 0
+       });
     var c = $.createButton({
         x:width  - 100,
         y:0,
@@ -908,7 +938,9 @@ function createEditButtons() {
             loadMap(MAP_TO_LOAD);
             createDragModels();
 
-       	}});
+       	},
+       	lifeTime: 0
+       });
 }
 
 function keyDown(key) {
@@ -952,6 +984,7 @@ function gameRunning() {
 	checkDestination();
     // the order is important!
     checkCollision();
+
     movePlayer();
     checkStab();
     checkGround();
@@ -1035,6 +1068,22 @@ function movePlayer() {
     	player.shape2.alpha = 0;
     	player.shape.alpha = 1;
     }
+    var i = trimX(player.shape.x + player.xSpeed + 4);
+    var j = trimY(player.shape.y + player.ySpeed);
+    if (blocks[i][j].type == TYPE_BLOCK || blocks[i][j].type == TYPE_BLOCK_SOLID) {
+    	player.ySpeed =  player.shape.y - 32 - blocks[i][j].shape.y;
+    	
+    };
+    var i = trimX(player.shape.x + player.xSpeed + 20);
+    var j = trimY(player.shape.y + player.ySpeed);
+    if (blocks[i][j].type == TYPE_BLOCK || blocks[i][j].type == TYPE_BLOCK_SOLID) {
+    	player.ySpeed =  player.shape.y - 32 - blocks[i][j].shape.y;
+    	
+    };
+
+    if (player.ySpeed > MAX_FALLING_SPEED) {
+    	player.ySpeed = MAX_FALLING_SPEED;
+    };
 	player.shape.x += player.xSpeed;  	
     player.shape.y += player.ySpeed;
     player.shape2.x += player.xSpeed;  	
@@ -1109,6 +1158,10 @@ function checkGround() {
         };
     };
     if (!hit) {
+    	if (!player.ySpeed) {
+    		player.currentPower ++;
+    	};
+    	
         player.ySpeed += GRAVITY;
         for (i = start_i; i <= end_i; i++) {
             if (blocks[i][j+1].type == TYPE_BLOCK || blocks[i][j+1].type == TYPE_BLOCK_SOLID) {
@@ -1272,33 +1325,12 @@ function ready() {
 
 }
 
-var dispatcher = {};
-dispatcher.added = function(e) {
-	var comment = e.target;
-	if (!comment.hasOwnProperty('data') || !comment.data.hasOwnProperty('text')) {
-        return;
-    }
-    trace(comment.data.text);
-};
-var len = $.root.numChildren;
-for (var i = 0; i < len; ++i) {
-    var child = $.root.getChildAt(i);
-    if (!child.hasOwnProperty('data') || !child.data.hasOwnProperty('text')) {
-        continue;
-    }
-    trace(i);
-    trace(child.data.text);
-    dispatcher.added({
-        target: child
-    });
-}
-$.root.addEventListener('added', dispatcher.added);
+
 
 
 Player.commentTrigger(function(data){
-	trace("input");
 	if (waitingForInput) {
-		trace(data.text);
+		CURRENT_MODE = PLAY_MODE;
 		MAP_TO_LOAD = data.text;
 		main(PLAY_MODE);
 		loadMap(data.text);
@@ -1316,6 +1348,7 @@ function main(mode) {
     if (mode == EDIT_MODE) {
     	createEditButtons();
     } else if (mode == PLAY_MODE) {
+    	trace("here");
     	createMainButtons();
     }
 
@@ -1327,7 +1360,7 @@ function main(mode) {
 	},INT_MAX,true);
 
 
-	$.frameRate = 40;
+	$.frameRate = 30;
 	$.root.addEventListener("enterFrame", gameRunning);
 
 	$.root.mouseEnabled = true;
@@ -1447,5 +1480,4 @@ function main(mode) {
 }
 
 ready();
-
 
