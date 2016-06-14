@@ -497,7 +497,7 @@ var Bullet = {
 		x:player.shape.x + 20,
 		y:player.shape.y + 10,
 		speed:speed,
-		Life:100
+		Life:200
 		};
 		trace("shoot2");
 		this.bullets.push(initBullet);
