@@ -13,6 +13,7 @@ var raw_player2 = "jZVZTJRXFMc-Zh9mcWAQBmYYZiIzIhS0MUAt4gIIPLTGQEBFURaR2ook2LpgB
 var map1 = "`JcyxDcJQEANQ2xES+qGwKH91ugkQy9JGTBA2YDRM4u5Zll8GgQdZNlQi37c+gPqQ2p6rg3FC8G4sxW5td4ysVoDqwgVBH8njmDPMc+IxbZ3I0NPSf1b4prn+ALn+";
 var map2 = "`TYwxCgAgDANPKrr2Kbo5+v9XWRsEAy1NcpQCdOfKYuJaMOUVTzUBjgSMB1SZJq6wY29PTACvMb0bmRmf-ACf";
 var map3 = "`c2BgYGBUVAGRDEIMILAQynEAUgKMEA6zA4hkWAKUdQBxuETAHEZkDn4ZBjBnAQ+Qc4CZQ4CBYdGEBUAZhg3MAA3M";
+var raw_bullet = "Qk2aAAAAAAAAADYAAAAoAAAABQAAAPv///8BACAAAAAAAGQAAADEDgAAxA4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/wAAAP8AAAAAAAAAAAAAAAAAAAD/AAAA/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
 var mainCanvas;
 var GUICanvas;
 var blackCurtain;
@@ -75,7 +76,81 @@ var TYPE_TRAP_DOWN = 10;
 var TYPE_TRAP_LEFT = 11;
 var TYPE_TRAP_RIGHT = 12;
 var MAX_FALLING_SPEED = 25;
+//↓New Bitmap Loader
+var BASE64_CHARS2 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
+function argb2rgba2(data) {
+    var batch = [];
+    batch.length = 4;
+    for (var i = 0; i < data.length; i += 4) {
+
+        batch[0] = data[i];
+        batch[1] = data[i+1];
+        batch[2] = data[i+2];
+        batch[3] = data[i+3];
+
+        var alpha = data[i+3];
+        batch.unshift(alpha);
+        batch.pop();
+        data[i] = batch[0];
+        data[i+1] = batch[1];
+        data[i+2] = batch[2];
+        data[i+3] = batch[3];
+    }
+    return data;
+}
+
+function extract2(data) {
+    var bmd = Bitmap.createBitmapData(1, 1);
+    var output = bmd.getPixels(bmd.rect);
+    output.clear();
+    var dataBuffer = [];
+    dataBuffer.length = 4;
+    var outputBuffer = [];
+    outputBuffer.length = 3;
+    var cnt = 0;
+    for (var i = 0; i < data.length; i += 4) {
+        for (var j = 0; j < 4 && i + j < data.length; j++) {
+            dataBuffer[j] = BASE64_CHARS2.indexOf(data.charAt(i + j));
+        }
+
+        // attention, bgr to rgb convertion!
+        outputBuffer[0] = (dataBuffer[0] << 2) + ((dataBuffer[1] & 0x30) >> 4);
+        outputBuffer[1] = ((dataBuffer[1] & 0x0f) << 4) + ((dataBuffer[2] & 0x3c) >> 2);
+        outputBuffer[2] = ((dataBuffer[2] & 0x03) << 6) + dataBuffer[3];
+        for (var k = 0; k < outputBuffer.length; k++) {
+            if (dataBuffer[k + 1] == 64) break;
+            if (cnt >= 54) { // skip bmp header
+                //if (cnt % 3 == 1) {
+                //    output.writeByte(255); // add alpha channel
+                //};
+                output.writeByte(outputBuffer[k]);
+            }
+            cnt++;
+        }
+    }
+    output = argb2rgba2(output);
+    output.position = 0;
+    return output;
+}
+
+function loadBitmapData2(width, height, raw) {
+    var bmd = Bitmap.createBitmapData(width, height);
+    //trace((extract(raw)).length);
+    bmd.setPixels(bmd.rect, extract2(raw));
+    return bmd;
+}
+
+function createBitmap2(bitmapData, lifeTime, scale, parent) {
+    var bmp = Bitmap.createBitmap2({
+        bitmapData: bitmapData,
+        lifeTime: lifeTime,
+        parent: parent,
+        scale: scale
+    });
+    return bmp;
+}
+//↑ New Bitmap Loader
 var tl = {};
 tl.x = width / 2 - XSIZE * 16;
 tl.y = height / 2 - YSIZE * 16;
@@ -390,6 +465,69 @@ function loadBitmapData(width, height, raw) {
     bmd.setPixels(bmd.rect, extract(raw));
     return bmd;
 }
+//Bullet
+var Bullet = {
+	speed:5,
+	width:5,
+	height:5,
+	init:function(){
+		this.bullets = [];
+		this.bulletPic = [];
+		this.bmd_bullet = loadBitmapData2(5,5,raw_bullet);
+	//	this.bulletPic = Bitmap.createBitmap({
+	//		bitmapData:this.bmd_bullet,
+	//		lifeTime:INT_MAX,
+	//		parent:mainCanvas
+	//	});
+		
+	},
+	
+	shoot:function(){
+		trace("shoot1");
+		var speed = 0;
+		if(player.shape2.alpha == 1){
+				bulletX = player.shape.x + 20;
+				speed = this.speed;
+			}
+			else{
+				bulletX = player.shape.x + 4;
+				speed -= this.speed;
+			}
+		var initBullet = {
+		x:player.shape.x + 20,
+		y:player.shape.y + 10,
+		speed:speed,
+		Life:100
+		};
+		trace("shoot2");
+		this.bullets.push(initBullet);
+		var pic = Bitmap.createBitmap({
+			bitmapData:this.bmd_bullet,
+			lifeTime:INT_MAX,
+			parent:mainCanvas
+			});
+		this.bulletPic.push(pic);
+		trace(this.bullets);
+	},
+	drawBullet:function(){
+		var bullet1 = []; 
+		for(var i = 0;i<this.bullets.length;i+=1){
+			//trace("drawshoot" + i + "|" + this.bullets[i].x + "|" + this.bullets[i].y + "|" + this.bullets[i].speed);
+			bullet1.push({});
+			bullet1[i] = {};
+			bullet1[i].shape = this.bulletPic[i];
+			bullet1[i].shape.x = this.bullets[i].x;
+			bullet1[i].shape.y = this.bullets[i].y;
+			this.bullets[i].x += this.bullets[i].speed;
+			this.bullets[i].Life--;
+			if(this.bullets[i].Life <= 0){
+			this.bullets.splice(i,1);
+			this.bulletPic.splice(i,1);
+			};
+		}
+	}
+};
+//Bullet
 
 function init() {
     ScriptManager.clearTimer();
@@ -962,6 +1100,9 @@ function keyDown(key) {
 	if (key == 68) {
 		player.xSpeed = X_SPEED;
 	};
+	if (key == 83) {
+		Bullet.shoot();
+	};
 }
 
 
@@ -990,6 +1131,7 @@ function gameRunning() {
     checkGround();
     checkCeiling(); 
     checkTrap();
+    Bullet.drawBullet();
 }
 
 function trapMove() {
@@ -1344,6 +1486,7 @@ function main(mode) {
     createMainCanvas();
     createGUICanvas();
     createPlayer();
+    Bullet.init();
 
     if (mode == EDIT_MODE) {
     	createEditButtons();
